@@ -2,6 +2,8 @@ import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '@/views/HomeView.vue'
 import SignUpView from "@/views/SignUpView.vue";
 import LoginView from "@/views/LoginView.vue";
+import EnvironmentSelectorView from "@/views/EnvironmentSelectorView.vue";
+import DashboardView from "@/views/DashboardView.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -20,6 +22,16 @@ const router = createRouter({
       path: '/login',
       name: 'login',
       component: LoginView,
+    },
+    {
+      path: '/environment-selector',
+      name: 'environment-selector',
+      component: EnvironmentSelectorView,
+    },
+    {
+      path: '/dashboard',
+      name: 'dashboard',
+      component: DashboardView,
     },
   ],
 })

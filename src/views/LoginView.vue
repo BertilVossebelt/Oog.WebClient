@@ -1,5 +1,8 @@
 <script setup lang="ts">
 import { reactive } from 'vue'
+import { useRouter } from 'vue-router';
+
+const router = useRouter();
 
 interface Credentials {
   username: string
@@ -12,6 +15,7 @@ const credentials: Credentials = reactive({
 })
 
 const register = async () => {
+
   fetch("https://localhost:4040/api/v1/account/authenticate", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -21,6 +25,7 @@ const register = async () => {
     .then((response) => {
       if (!response.ok) throw Error(`Failed to login: ${response.statusText}`)
       console.log("Login successful:", response.json())
+      router.push('/environment-selector');
     })
     .catch((error) => {
       console.error("An Error occurred during login:", error)
