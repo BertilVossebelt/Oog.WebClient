@@ -1,0 +1,39 @@
+@import './base.css';
+
+#app {
+  margin: 0 auto;
+  padding: 5px;
+  font-weight: normal;
+}
+
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;  /* Vertically center everything */
+  align-items: center;  /* Horizontally center content */
+  height: 99vh;
+}
+
+.align-contents-center {
+  display: flex;
+  flex-direction: column;
+}
+
+.small-display-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: calc(18rem + 30vw);
+  max-width: 90%;
+  padding: 20px;
+  border-radius: 10px;
+  border: 1px solid #404040;
+  margin-bottom: 20px;  /* Space between form box and button */
+}
+
+.logo {
+  color: #fff;
+  font-size: 50px;
+  font-weight: bold;
+  text-align: center;
+}
