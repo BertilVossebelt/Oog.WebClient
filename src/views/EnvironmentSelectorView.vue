@@ -1,50 +1,69 @@
 <script setup lang="ts">
-import { ref, nextTick } from 'vue';
-import { useRouter } from 'vue-router';
+import { nextTick, onMounted, reactive, ref } from 'vue'
+import { useRouter } from 'vue-router'
 
-const router = useRouter();
+const router = useRouter()
 
-interface Environment {
-  name: string;
+interface Env {
+  name: string
 }
 
-const environments = ref<Environment[]>([
-  { name: 'Customer environment' },
-  { name: 'Customer environment 2' },
-  { name: 'Customer environment 3' },
-  { name: 'Customer environment 4' },
-  { name: 'Customer environment 5' },
-  { name: 'Customer environment 6' },
-  { name: 'Customer environment 7' }
-]);
-
-const showInput = ref<boolean>(false);
-const newEnvName = ref<string>('');
-
+const envs = ref<Env[]>([])
 
 const goToDashboard = (): void => {
-  router.push('/dashboard');
-};
+  router.push('/dashboard')
+}
 
-const toggleInput = (): void => {
-  showInput.value = !showInput.value;
+const showInput = ref<boolean>(false)
+const toggleNewEnvInput = (): void => {
+  showInput.value = !showInput.value
+
+  // Focus on the input of the new env box when DOM is ready.
   if (showInput.value) {
     nextTick(() => {
-      const inputField = document.querySelector('input') as HTMLInputElement;
-      inputField?.focus();
-    });
+      const inputField = document.querySelector('input') as HTMLInputElement
+      inputField?.focus()
+    })
   }
-};
+}
 
-const addEnvironment = (): void => {
-  if (newEnvName.value.trim()) {
-    environments.value.unshift({ name: newEnvName.value });
-    newEnvName.value = '';
-  }
-  showInput.value = false;
-};
+const newEnv: Env = reactive({ name: '' })
+const createNewEnv = async () => {
+  fetch('https://localhost:4040/api/v1/environment/create', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(newEnv),
+    credentials: 'include',
+  })
+    .then((response) => {
+      if (!response.ok) throw Error(`Failed to create a new environment: ${response.statusText}`)
+      console.log('Environment creation successful:', response.json())
+
+      // Add new environment to the list, reset the new env box.
+      envs.value.unshift({ name: newEnv.name })
+      showInput.value = false
+      newEnv.name = ''
+    })
+    .catch((error) => {
+      console.error('An Error occurred during environment creation:', error)
+    })
+}
+
+onMounted(() => {
+  fetch('https://localhost:4040/api/v1/environment/read', {
+    method: 'GET',
+    headers: { 'Content-Type': 'application/json' },
+    credentials: 'include',
+  })
+    .then(async (response) => {
+      if (!response.ok) throw Error(`Failed to create a new environment: ${response.statusText}`)
+      envs.value = await response.json()
+    })
+    .catch((error) => {
+      console.error('An Error occurred during environment creation:', error)
+    })
+})
 </script>
-
 
 <template>
   <div class="wrapper">
@@ -53,23 +72,19 @@ const addEnvironment = (): void => {
     </div>
     <div class="selector-container">
       <div class="environment-selector">
-        <div class="env-box add-env" @click="toggleInput">
+        <div class="add-env" @click="toggleNewEnvInput">
           <span class="plus">+</span>
         </div>
 
-        <!-- Animated new environment box -->
+        <!-- New environment box -->
         <transition name="fade-scale">
           <div class="env-box new-env-box" v-if="showInput">
-            <input
-              v-model="newEnvName"
-              @keyup.enter="addEnvironment"
-              placeholder="Give us a name"
-            />
-            <button class="create-btn" @click="addEnvironment">Create</button>
+            <input v-model="newEnv.name" @keyup.enter="createNewEnv" placeholder="Give us a name" />
+            <button class="create-btn" @click="createNewEnv">Create</button>
           </div>
         </transition>
 
-        <div class="env-box" v-for="(env, index) in environments" :key="index" @click="goToDashboard()">
+        <div class="env-box" v-for="(env, index) in envs" :key="index" @click="goToDashboard()">
           {{ env.name }}
         </div>
       </div>
@@ -99,7 +114,7 @@ const addEnvironment = (): void => {
 
 .selector-container {
   display: flex;
-  justify-content: center;
+  justify-content: left;
   align-items: center;
   border: 2px solid var(--color-border);
   border-radius: 10px;
@@ -126,16 +141,18 @@ const addEnvironment = (): void => {
   color: var(--vt-c-white);
   padding: 20px;
   border-radius: 10px;
-  min-width: 100px;
-  max-width: 180px;
+  width: 180px;
   height: 100px;
   font-size: 17px;
   font-weight: bold;
   flex-shrink: 0;
   margin-bottom: 10px;
+  cursor: pointer;
 }
 
 .add-env {
+  width: 100px;
+  height: 100px;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -220,7 +237,9 @@ const addEnvironment = (): void => {
 /* Opening/Closing animation */
 .fade-scale-enter-active,
 .fade-scale-leave-active {
-  transition: opacity 0.35s ease, transform 0.35s ease;
+  transition:
+    opacity 0.35s ease,
+    transform 0.35s ease;
 }
 
 .fade-scale-enter-from,
@@ -254,7 +273,8 @@ const addEnvironment = (): void => {
     align-items: center;
   }
 
-  .env-box, .add-env {
+  .env-box,
+  .add-env {
     width: 100%;
     max-width: 200px;
     margin: 0 10px 0 0;

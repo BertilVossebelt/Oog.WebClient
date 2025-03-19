@@ -1,7 +1,14 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref } from "vue";
 
-const logs = ref([
+interface log {
+  time: string;
+  severity: "Info" | "Error" | "Critical" | "Warning" | "Debug";
+  details: string;
+  tags: string[];
+}
+
+const logs = ref<log[]>([
   {
     time: '12:24:34 03-03-2025',
     severity: 'Error',
@@ -22,7 +29,6 @@ const logs = ref([
   }
 ]);
 </script>
-
 
 <template>
   <h1 class="title">Customer environment</h1>

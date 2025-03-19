@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { reactive } from 'vue'
+import { reactive } from "vue";
 
 interface Credentials {
-  username: string
-  password: string
+  username: string,
+  password: string,
   password_confirmation: string
 }
 
