@@ -14,7 +14,7 @@ const credentials: Credentials = reactive({
   password: "",
 })
 
-const register = async () => {
+const login = async () => {
   fetch("https://localhost:4040/api/v1/account/authenticate", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -47,7 +47,7 @@ const register = async () => {
       </form>
     </div>
 
-    <button type="submit" class="submit-btn" @click="register">LogIn</button>
+    <button type="submit" class="submit-btn" @click="login">LogIn</button>
     <RouterLink to="/signup" class="register-link">Don't have an account?</RouterLink>
   </div>
 </template>

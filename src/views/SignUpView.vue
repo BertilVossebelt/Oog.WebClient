@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { reactive } from "vue";
+import router from "@/router";
 
 interface Credentials {
   username: string,
@@ -14,17 +15,35 @@ const credentials: Credentials = reactive({
 })
 
 const register = async (): Promise<void> => {
-  fetch("https://localhost:7073/api/v1/account/create", {
+  fetch("https://localhost:4040/api/v1/account/create", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(credentials),
   })
     .then((response) => {
-      if (!response.ok) throw new Error(`Failed to register: ${response.statusText}`)
-      console.log("Registration successful:", response.json())
+      if (!response.ok) throw new Error(`Failed to register: ${response.statusText}`);
+      console.log("Registration successful:", response.json());
+      login();
     })
     .catch((error) => {
-      console.error("An Error occurred during registration:", error)
+      console.error("An Error occurred during registration:", error);
+    });
+}
+
+const login = async () => {
+  fetch("https://localhost:4040/api/v1/account/authenticate", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(credentials),
+    credentials: "include"
+  })
+    .then((response) => {
+      if (!response.ok) throw Error(`Failed to login: ${response.statusText}`);
+      console.log("Login successful:", response.json());
+      router.push("/environment-selector");
+    })
+    .catch((error) => {
+      console.error("An Error occurred during login:", error);
     });
 }
 </script>

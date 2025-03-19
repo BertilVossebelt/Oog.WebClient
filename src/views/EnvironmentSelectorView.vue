@@ -1,17 +1,16 @@
 <script setup lang="ts">
 import { nextTick, onMounted, reactive, ref } from 'vue'
-import { useRouter } from 'vue-router'
-
-const router = useRouter()
+import router from "@/router";
 
 interface Env {
-  name: string
+  id: bigint;
+  name: string,
 }
 
 const envs = ref<Env[]>([])
 
-const goToDashboard = (): void => {
-  router.push('/dashboard')
+const goToDashboard = (envId): void => {
+  router.push('/dashboard?env=' + envId)
 }
 
 const showInput = ref<boolean>(false)
@@ -36,16 +35,16 @@ const createNewEnv = async () => {
     credentials: 'include',
   })
     .then((response) => {
-      if (!response.ok) throw Error(`Failed to create a new environment: ${response.statusText}`)
-      console.log('Environment creation successful:', response.json())
+      if (!response.ok) throw Error(`Failed to create a new environment: ${response.statusText}`);
+      console.log('Environment creation successful:', response.json());
 
       // Add new environment to the list, reset the new env box.
-      envs.value.unshift({ name: newEnv.name })
-      showInput.value = false
-      newEnv.name = ''
+      envs.value.unshift({ name: newEnv.name });
+      showInput.value = false;
+      newEnv.name = "";
     })
     .catch((error) => {
-      console.error('An Error occurred during environment creation:', error)
+      console.error('An Error occurred during environment creation:', error);
     })
 }
 
@@ -56,12 +55,12 @@ onMounted(() => {
     credentials: 'include',
   })
     .then(async (response) => {
-      if (!response.ok) throw Error(`Failed to create a new environment: ${response.statusText}`)
-      envs.value = await response.json()
+      if (!response.ok) throw Error(`Failed to create a new environment: ${response.statusText}`);
+      envs.value = await response.json();
     })
     .catch((error) => {
-      console.error('An Error occurred during environment creation:', error)
-    })
+      console.error('An Error occurred during environment creation:', error);
+    });
 })
 </script>
 
@@ -84,12 +83,12 @@ onMounted(() => {
           </div>
         </transition>
 
-        <div class="env-box" v-for="(env, index) in envs" :key="index" @click="goToDashboard()">
+        <div class="env-box" v-for="(env, index) in envs" :key="index" @click="goToDashboard(env.id)">
           {{ env.name }}
         </div>
       </div>
     </div>
-    <p class="choose-text">Choose an environment</p>
+    <h1 class="choose-text">Choose an environment</h1>
   </div>
 </template>
 
@@ -150,6 +149,12 @@ onMounted(() => {
   cursor: pointer;
 }
 
+.env-box:hover {
+  outline: 2px solid #404040;
+  outline-offset: 5px;
+  transition: 0.2s ease-out;
+}
+
 .add-env {
   width: 100px;
   height: 100px;
@@ -165,7 +170,7 @@ onMounted(() => {
   cursor: pointer;
 }
 
-.env-box:hover {
+.add-env:hover {
   outline: 2px solid #404040;
   outline-offset: 5px;
   transition: 0.2s ease-out;

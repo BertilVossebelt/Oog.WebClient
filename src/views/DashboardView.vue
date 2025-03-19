@@ -32,6 +32,9 @@ const logs = ref<log[]>([
 
 <template>
   <h1 class="title">Customer environment</h1>
+  <div class="top-right">
+    <a href="#" class="env-settings">Environment settings ⛭</a>
+  </div>
   <div class="table-container">
     <div class="table-wrapper">
       <table>
@@ -58,6 +61,12 @@ const logs = ref<log[]>([
 </template>
 
 <style scoped>
+.top-right {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+}
+
 .table-container {
   display: flex;
   flex-direction: column;
@@ -72,6 +81,18 @@ const logs = ref<log[]>([
   font-weight: bold;
   align-self: flex-start;
   color: #fff;
+}
+
+.env-settings {
+  color: var(--vt-c-white);
+  text-decoration: none;
+  font-size: 15px;
+  font-weight: bold;
+  margin-right: 10px;
+}
+
+.env-settings:hover {
+  text-decoration: underline;
 }
 
 .table-wrapper {
