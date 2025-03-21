@@ -1,28 +1,64 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { onMounted, ref } from "vue";
+import { useEnvironmentStore } from "@/stores/environment";
 
-const people = ref([{ username: 'johndoe@hotmail.com' }, { username: 'johndoe@gmail.com' }])
+const environmentStore = useEnvironmentStore();
 
-const newUsername = ref('')
-const showInput = ref(false)
-
-const toggleInput = () => {
-  showInput.value = !showInput.value
-  if (!showInput.value) newUsername.value = ''
+interface Person {
+  username: string;
 }
 
-fetch('https://localhost:4040/api/v1/000/read', {
-  method: 'GET',
-  headers: { 'Content-Type': 'application/json' },
-  credentials: 'include',
-})
-  .then(async (response) => {
-    if (!response.ok) throw Error(`Failed to create a new environment: ${response.statusText}`)
-    envs.value = await response.json()
+const people = ref<Person[]>([]);
+
+const showInput = ref(false);
+const newAccount = ref("");
+const toggleInput = () => {
+  showInput.value = !showInput.value;
+  newAccount.value = "";
+};
+
+const addPerson = () => {
+  fetch("https://localhost:4040/api/v1/environment/add/account", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      envId: environmentStore.currentEnvId,
+      username: newAccount.value,
+    }),
+    credentials: "include",
   })
-  .catch((error) => {
-    console.error('An Error occurred during environment creation:', error)
+    .then((response) => {
+      if (!response.ok) throw Error(response.statusText);
+    })
+    .then(async () => {
+      people.value.unshift({ username: newAccount.value });
+      toggleInput();
+    })
+    .catch((error) => {
+      console.error(error);
+    });
+};
+
+onMounted(() => {
+  fetch("https://localhost:4040/api/v1/environment/get/accounts", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      envId: environmentStore.currentEnvId,
+    }),
+    credentials: "include",
   })
+    .then((response) => {
+      if (!response.ok) throw Error(response.statusText);
+      return response.json();
+    })
+    .then(async (data) => {
+      people.value = data;
+    })
+    .catch((error) => {
+      console.error(error);
+    });
+});
 </script>
 
 <template>
@@ -44,7 +80,7 @@ fetch('https://localhost:4040/api/v1/000/read', {
           <tr v-if="showInput">
             <td colspan="1" class="input-row">
               <input
-                v-model="newUsername"
+                v-model="newAccount"
                 @keyup.enter="addPerson"
                 placeholder="Give us an e-mail address"
                 class="add-person-input"
@@ -183,7 +219,6 @@ tr:last-child td {
   top: 10px;
   right: 10px;
 }
-
 
 .back {
   color: var(--vt-c-white);

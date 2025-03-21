@@ -5,6 +5,8 @@ import LoginView from "@/views/LoginView.vue";
 import EnvironmentSelectorView from "@/views/EnvironmentSelectorView.vue";
 import DashboardView from "@/views/DashboardView.vue";
 import PeopleManagementView from "@/views/PeopleManagementView.vue";
+import EnvironmentSettings from "@/views/EnvironmentSettings.vue";
+import ApplicationManagementView from "@/views/ApplicationManagementView.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -33,6 +35,16 @@ const router = createRouter({
       path: '/dashboard',
       name: 'dashboard',
       component: DashboardView,
+    },
+    {
+      path: '/environment-settings',
+      name: 'environment-settings',
+      component: EnvironmentSettings,
+    },
+    {
+      path: '/application-management',
+      name: 'application-settings',
+      component: ApplicationManagementView,
     },
     {
       path: '/people-management',

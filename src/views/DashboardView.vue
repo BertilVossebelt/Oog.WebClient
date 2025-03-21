@@ -10,49 +10,52 @@ interface log {
 
 const logs = ref<log[]>([
   {
-    time: '12:24:34 03-03-2025',
-    severity: 'Error',
-    details: 'Lorem Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.  ',
-    tags: ['suspicious behaviour']
+    time: "12:24:34 03-03-2025",
+    severity: "Error",
+    details:
+      "Lorem Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.  ",
+    tags: ["suspicious behaviour"],
   },
   {
-    time: '12:24:12 03-03-2025',
-    severity: 'Info',
-    details: 'Lorem Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.  ',
-    tags: ['sale', 'e-mail sent']
+    time: "12:24:12 03-03-2025",
+    severity: "Info",
+    details:
+      "Lorem Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.  ",
+    tags: ["sale", "e-mail sent"],
   },
   {
-    time: '12:22:54 02-03-2025',
-    severity: 'Critical',
-    details: 'Lorem Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.  ',
-    tags: ['suspicious behaviour']
-  }
+    time: "12:22:54 02-03-2025",
+    severity: "Critical",
+    details:
+      "Lorem Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.  ",
+    tags: ["suspicious behaviour"],
+  },
 ]);
 </script>
 
 <template>
   <h1 class="title">Customer environment</h1>
   <div class="top-right">
-    <a href="#" class="env-settings">Environment settings ⛭</a>
+    <RouterLink to="/environment-settings" class="env-settings">Environment settings ⛭</RouterLink>
   </div>
   <div class="table-container">
     <div class="table-wrapper">
       <table>
         <thead>
-        <tr>
-          <th class="time-col">Time</th>
-          <th class="severity-col">Severity</th>
-          <th class="details-col">Details</th>
-          <th class="tags-col">Tags</th>
-        </tr>
+          <tr>
+            <th class="time-col">Time</th>
+            <th class="severity-col">Severity</th>
+            <th class="details-col">Details</th>
+            <th class="tags-col">Tags</th>
+          </tr>
         </thead>
         <tbody>
-        <tr v-for="(log, index) in logs" :key="index">
-          <td class="time-col">{{ log.time }}</td>
-          <td class="severity-col">{{ log.severity }}</td>
-          <td class="details-col">{{ log.details }}</td>
-          <td class="tags-col">{{ log.tags.join(', ') }}</td>
-        </tr>
+          <tr v-for="(log, index) in logs" :key="index">
+            <td class="time-col">{{ log.time }}</td>
+            <td class="severity-col">{{ log.severity }}</td>
+            <td class="details-col">{{ log.details }}</td>
+            <td class="tags-col">{{ log.tags.join(", ") }}</td>
+          </tr>
         </tbody>
       </table>
     </div>
@@ -112,7 +115,8 @@ table {
   font-size: 16px;
 }
 
-th, td {
+th,
+td {
   padding: 15px;
   text-align: left;
   border-bottom: 1px solid var(--color-border);

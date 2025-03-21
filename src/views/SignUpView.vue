@@ -66,7 +66,7 @@ const login = async () => {
         />
 
         <!-- Password confirmation -->
-        <label for="PasswordConfirmationInput">Password confirmation:</label>
+        <label for="PasswordConfirmationInput">:Password confirmation</label>
         <input
           id="PasswordConfirmationInput"
           type="password"
@@ -113,18 +113,6 @@ input:focus {
   outline: 2px solid #404040;
   outline-offset: 5px;
   transition: 0.2s ease-out;
-}
-
-.small-display-box {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  width: calc(18rem + 30vw);
-  max-width: 90%;
-  padding: 20px;
-  border-radius: 10px;
-  border: 1px solid #404040;
-  margin-bottom: 20px;
 }
 
 .submit-btn {

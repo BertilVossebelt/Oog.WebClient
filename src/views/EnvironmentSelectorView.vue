@@ -1,67 +1,97 @@
 <script setup lang="ts">
-import { nextTick, onMounted, reactive, ref } from 'vue'
+import { nextTick, onMounted, reactive, ref } from "vue";
+import { useEnvironmentStore } from '@/stores/environment';
 import router from "@/router";
+
+const environmentStore = useEnvironmentStore();
 
 interface Env {
   id: bigint;
-  name: string,
+  name: string;
 }
 
-const envs = ref<Env[]>([])
+const envs = ref<Env[]>([]);
 
-const goToDashboard = (envId): void => {
-  router.push('/dashboard?env=' + envId)
-}
+/*
+* OnClick method for env boxes.
+*/
+const goToDashboard = (envId: bigint): void => {
+  environmentStore.setEnvId(envId);
+  router.push("/dashboard");
+};
 
-const showInput = ref<boolean>(false)
+/*
+* Toggle for new env box.
+*/
+const showInput = ref<boolean>(false);
 const toggleNewEnvInput = (): void => {
-  showInput.value = !showInput.value
+  showInput.value = !showInput.value;
 
   // Focus on the input of the new env box when DOM is ready.
   if (showInput.value) {
     nextTick(() => {
-      const inputField = document.querySelector('input') as HTMLInputElement
-      inputField?.focus()
-    })
+      const inputField = document.querySelector("input") as HTMLInputElement;
+      inputField?.focus();
+    });
   }
+};
+
+/*
+* Create a new env and add it to the env picker.
+*/
+interface EnvResponseData {
+  id: bigint;
+  name: string;
 }
 
-const newEnv: Env = reactive({ name: '' })
+const newEnv: Env = reactive({ id: 0n, name: "" });
 const createNewEnv = async () => {
-  fetch('https://localhost:4040/api/v1/environment/create', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+  fetch("https://localhost:4040/api/v1/environment/create", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify(newEnv),
-    credentials: 'include',
+    credentials: "include",
   })
     .then((response) => {
-      if (!response.ok) throw Error(`Failed to create a new environment: ${response.statusText}`);
-      console.log('Environment creation successful:', response.json());
+      if (!response.ok) throw Error(response.statusText);
+      return response.json();
+    })
+    .then((data: EnvResponseData) => {
+      const createdEnv: Env = {
+        id: BigInt(data.id),
+        name: data.name,
+      }
 
       // Add new environment to the list, reset the new env box.
-      envs.value.unshift({ name: newEnv.name });
+      envs.value.unshift(createdEnv);
       showInput.value = false;
       newEnv.name = "";
     })
     .catch((error) => {
-      console.error('An Error occurred during environment creation:', error);
-    })
-}
+      console.error(error);
+    });
+};
 
+/*
+// Request all environments of the current user on page load.
+*/
 onMounted(() => {
-  fetch('https://localhost:4040/api/v1/environment/read', {
-    method: 'GET',
-    headers: { 'Content-Type': 'application/json' },
-    credentials: 'include',
+  fetch("https://localhost:4040/api/v1/environment/read", {
+    method: "GET",
+    headers: { "Content-Type": "application/json" },
+    credentials: "include",
   })
-    .then(async (response) => {
-      if (!response.ok) throw Error(`Failed to create a new environment: ${response.statusText}`);
-      envs.value = await response.json();
+    .then((response) => {
+      if (!response.ok) throw Error(response.statusText);
+      return response.json();
+    })
+    .then(async (data) => {
+      envs.value = data;
     })
     .catch((error) => {
-      console.error('An Error occurred during environment creation:', error);
+      console.error(error);
     });
-})
+});
 </script>
 
 <template>
@@ -83,7 +113,12 @@ onMounted(() => {
           </div>
         </transition>
 
-        <div class="env-box" v-for="(env, index) in envs" :key="index" @click="goToDashboard(env.id)">
+        <div
+          class="env-box"
+          v-for="(env, index) in envs"
+          :key="index"
+          @click="goToDashboard(env.id)"
+        >
           {{ env.name }}
         </div>
       </div>
@@ -166,6 +201,7 @@ onMounted(() => {
   background: var(--vt-c-black-mute);
   border-radius: 13px;
   border: 2px solid var(--vt-c-white);
+  color: #fff;
   flex-shrink: 0;
   cursor: pointer;
 }
