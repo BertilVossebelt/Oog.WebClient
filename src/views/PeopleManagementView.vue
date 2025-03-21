@@ -64,7 +64,7 @@ onMounted(() => {
 <template>
   <h2 class="title">Customer environment</h2>
   <div class="top-right">
-    <a href="#" class="back">Back ⮨</a>
+    <RouterLink to="/environment-settings" class="back">Back ⮨</RouterLink>
   </div>
 
   <div class="table-container">

@@ -44,7 +44,7 @@ const createApp = () => {
 <template>
   <h2 class="title">Customer environment</h2>
   <div class="top-right">
-    <a href="#" class="back">Back ⮨</a>
+    <RouterLink to="/environment-settings" class="back">Back ⮨</RouterLink>
   </div>
   <div class="wrapper">
       <div class="small-display-box">
@@ -53,7 +53,10 @@ const createApp = () => {
           <label for="AppNameInput">Application name:</label>
           <input id="AppNameInput" type="text" v-model="app.name" />
         </form>
-        <p>{{ app.passkey }}</p>
+        <div v-if="app.passkey.length > 0" class="token-reveal">
+          <p>Be careful with your application token and save it somewhere else, it won't be shown ever again:</p>
+          <p>{{ app.passkey }}</p>
+        </div>
       </div>
 
       <button type="submit" class="submit-btn" @click="createApp">Register application</button>
@@ -97,6 +100,11 @@ input:focus {
   outline: 2px solid #404040;
   outline-offset: 5px;
   transition: 0.2s ease-out;
+}
+
+.token-reveal {
+  text-align: center;
+  color: #fff;
 }
 
 .submit-btn {

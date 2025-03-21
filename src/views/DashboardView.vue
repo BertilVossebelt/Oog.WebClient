@@ -37,6 +37,7 @@ const logs = ref<log[]>([
   <h1 class="title">Customer environment</h1>
   <div class="top-right">
     <RouterLink to="/environment-settings" class="env-settings">Environment settings ⛭</RouterLink>
+    <RouterLink to="/environment-selector" class="back">Back ⮨</RouterLink>
   </div>
   <div class="table-container">
     <div class="table-wrapper">
@@ -68,6 +69,17 @@ const logs = ref<log[]>([
   position: absolute;
   top: 10px;
   right: 10px;
+}
+.back {
+  color: var(--vt-c-white);
+  text-decoration: none;
+  font-size: 15px;
+  font-weight: bold;
+  margin-right: 10px;
+}
+
+.back:hover {
+  text-decoration: underline;
 }
 
 .table-container {
