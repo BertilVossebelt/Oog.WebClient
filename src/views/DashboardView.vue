@@ -1,36 +1,53 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import {onBeforeUnmount, onMounted, ref} from "vue";
+import { HubConnectionBuilder } from "@microsoft/signalr";
 
 interface log {
-  time: string;
-  severity: "Info" | "Error" | "Critical" | "Warning" | "Debug";
-  details: string;
+  logDateTime: Date;
+  severity: "Emergency" | "Alert" | "Critical" | "Error" | "Notice" | "Informational" | "Debug";
+  message: string;
   tags: string[];
 }
 
 const logs = ref<log[]>([
-  {
-    time: "12:24:34 03-03-2025",
-    severity: "Error",
-    details:
-      "Lorem Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.  ",
-    tags: ["suspicious behaviour"],
-  },
-  {
-    time: "12:24:12 03-03-2025",
-    severity: "Info",
-    details:
-      "Lorem Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.  ",
-    tags: ["sale", "e-mail sent"],
-  },
-  {
-    time: "12:22:54 02-03-2025",
-    severity: "Critical",
-    details:
-      "Lorem Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.  ",
-    tags: ["suspicious behaviour"],
-  },
 ]);
+
+// SignalR connection
+let connection: any = null;
+
+const setupSignalRConnection = async () => {
+  try {
+    // Create a connection to the SignalR hub
+    connection = new HubConnectionBuilder()
+      .withUrl("https://localhost:4040/rtes/v1/log")
+      .build();
+
+    // Start the connection
+    await connection.start();
+    console.log("Connected to the hub");
+
+    // Listen for logs coming from the server
+    connection.on("ReceiveLog", (log: log) => {
+      console.log("Received log:", log);
+      logs.value.unshift(log);
+    });
+  } catch (error) {
+    console.error("Error connecting to SignalR hub:", error);
+  }
+};
+
+// Clean up the connection when the component is destroyed
+onBeforeUnmount(() => {
+  if (connection) {
+    connection.stop();
+    console.log("Disconnected from SignalR hub");
+  }
+});
+
+// Set up the connection when the component is mounted
+onMounted(() => {
+  setupSignalRConnection();
+});
 </script>
 
 <template>
@@ -52,9 +69,9 @@ const logs = ref<log[]>([
         </thead>
         <tbody>
           <tr v-for="(log, index) in logs" :key="index">
-            <td class="time-col">{{ log.time }}</td>
+            <td class="time-col">{{log.logDateTime.toLocaleString()}}</td>
             <td class="severity-col">{{ log.severity }}</td>
-            <td class="details-col">{{ log.details }}</td>
+            <td class="details-col">{{ log.message }}</td>
             <td class="tags-col">{{ log.tags.join(", ") }}</td>
           </tr>
         </tbody>
@@ -70,6 +87,7 @@ const logs = ref<log[]>([
   top: 10px;
   right: 10px;
 }
+
 .back {
   color: var(--vt-c-white);
   text-decoration: none;

@@ -9,8 +9,8 @@
 .wrapper {
   display: flex;
   flex-direction: column;
-  justify-content: center;  /* Vertically center everything */
-  align-items: center;  /* Horizontally center content */
+  justify-content: center;
+  align-items: center;
   height: 99vh;
 }
 
@@ -28,7 +28,7 @@
   padding: 20px;
   border-radius: 10px;
   border: 1px solid #404040;
-  margin-bottom: 20px;  /* Space between form box and button */
+  margin-bottom: 20px;
 }
 
 .logo {

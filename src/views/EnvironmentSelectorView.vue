@@ -52,24 +52,24 @@ const createNewEnv = async () => {
     body: JSON.stringify(newEnv),
     credentials: "include",
   })
-    .then((response) => {
-      if (!response.ok) throw Error(response.statusText);
-      return response.json();
-    })
-    .then((data: EnvResponseData) => {
-      const createdEnv: Env = {
-        id: BigInt(data.id),
-        name: data.name,
-      }
+      .then((response) => {
+        if (!response.ok) throw Error(response.statusText);
+        return response.json();
+      })
+      .then((data: EnvResponseData) => {
+        const createdEnv: Env = {
+          id: BigInt(data.id),
+          name: data.name,
+        }
 
-      // Add new environment to the list, reset the new env box.
-      envs.value.unshift(createdEnv);
-      showInput.value = false;
-      newEnv.name = "";
-    })
-    .catch((error) => {
-      console.error(error);
-    });
+        // Add new environment to the list, reset the new env box.
+        envs.value.unshift(createdEnv);
+        showInput.value = false;
+        newEnv.name = "";
+      })
+      .catch((error) => {
+        console.error(error);
+      });
 };
 
 /*
@@ -81,16 +81,16 @@ onMounted(() => {
     headers: { "Content-Type": "application/json" },
     credentials: "include",
   })
-    .then((response) => {
-      if (!response.ok) throw Error(response.statusText);
-      return response.json();
-    })
-    .then(async (data) => {
-      envs.value = data;
-    })
-    .catch((error) => {
-      console.error(error);
-    });
+      .then((response) => {
+        if (!response.ok) throw Error(response.statusText);
+        return response.json();
+      })
+      .then(async (data) => {
+        envs.value = data;
+      })
+      .catch((error) => {
+        console.error(error);
+      });
 });
 </script>
 
@@ -114,11 +114,10 @@ onMounted(() => {
         </transition>
 
         <div
-          class="env-box"
-          v-for="(env, index) in envs"
-          :key="index"
-          @click="goToDashboard(env.id)"
-        >
+            class="env-box"
+            v-for="(env, index) in envs"
+            :key="index"
+            @click="goToDashboard(env.id)">
           {{ env.name }}
         </div>
       </div>
@@ -279,8 +278,8 @@ onMounted(() => {
 .fade-scale-enter-active,
 .fade-scale-leave-active {
   transition:
-    opacity 0.35s ease,
-    transform 0.35s ease;
+      opacity 0.35s ease,
+      transform 0.35s ease;
 }
 
 .fade-scale-enter-from,
