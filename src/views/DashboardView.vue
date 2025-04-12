@@ -1,6 +1,9 @@
 <script setup lang="ts">
-import {onBeforeUnmount, onMounted, ref} from "vue";
+import { onBeforeUnmount, onMounted, ref } from "vue";
+import { useEnvironmentStore } from "@/stores/environment";
 import { HubConnectionBuilder } from "@microsoft/signalr";
+
+const environmentStore = useEnvironmentStore();
 
 interface log {
   logDateTime: Date;
@@ -9,17 +12,19 @@ interface log {
   tags: string[];
 }
 
-const logs = ref<log[]>([
-]);
+const logs = ref<log[]>([]);
 
 // SignalR connection
 let connection: any = null;
 
 const setupSignalRConnection = async () => {
+  if (environmentStore.currentEnvId === null) return;
+  const envId = environmentStore.currentEnvId.toString();
+
   try {
     // Create a connection to the SignalR hub
     connection = new HubConnectionBuilder()
-      .withUrl("https://localhost:4040/rtes/v1/log")
+      .withUrl(`https://localhost:4040/rtes/v1/log?envId=${envId}`)
       .build();
 
     // Start the connection
@@ -69,7 +74,7 @@ onMounted(() => {
         </thead>
         <tbody>
           <tr v-for="(log, index) in logs" :key="index">
-            <td class="time-col">{{log.logDateTime.toLocaleString()}}</td>
+            <td class="time-col">{{ log.logDateTime.toLocaleString() }}</td>
             <td class="severity-col">{{ log.severity }}</td>
             <td class="details-col">{{ log.message }}</td>
             <td class="tags-col">{{ log.tags.join(", ") }}</td>
