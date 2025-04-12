@@ -1,9 +1,10 @@
 <script setup lang="ts">
-import { reactive } from 'vue'
+import { reactive } from "vue";
+import router from "@/router";
 
 interface Credentials {
-  username: string
-  password: string
+  username: string,
+  password: string,
   password_confirmation: string
 }
 
@@ -14,17 +15,35 @@ const credentials: Credentials = reactive({
 })
 
 const register = async (): Promise<void> => {
-  fetch("https://localhost:7073/api/v1/account/create", {
+  fetch("https://localhost:4040/api/v1/account/create", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(credentials),
   })
     .then((response) => {
-      if (!response.ok) throw new Error(`Failed to register: ${response.statusText}`)
-      console.log("Registration successful:", response.json())
+      if (!response.ok) throw new Error(`Failed to register: ${response.statusText}`);
+      console.log("Registration successful:", response.json());
+      login();
     })
     .catch((error) => {
-      console.error("An Error occurred during registration:", error)
+      console.error("An Error occurred during registration:", error);
+    });
+}
+
+const login = async () => {
+  fetch("https://localhost:4040/api/v1/account/authenticate", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(credentials),
+    credentials: "include"
+  })
+    .then((response) => {
+      if (!response.ok) throw Error(`Failed to login: ${response.statusText}`);
+      console.log("Login successful:", response.json());
+      router.push("/environment-selector");
+    })
+    .catch((error) => {
+      console.error("An Error occurred during login:", error);
     });
 }
 </script>
@@ -47,7 +66,7 @@ const register = async (): Promise<void> => {
         />
 
         <!-- Password confirmation -->
-        <label for="PasswordConfirmationInput">Password confirmation:</label>
+        <label for="PasswordConfirmationInput">:Password confirmation</label>
         <input
           id="PasswordConfirmationInput"
           type="password"
@@ -94,18 +113,6 @@ input:focus {
   outline: 2px solid #404040;
   outline-offset: 5px;
   transition: 0.2s ease-out;
-}
-
-.small-display-box {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  width: calc(18rem + 30vw);
-  max-width: 90%;
-  padding: 20px;
-  border-radius: 10px;
-  border: 1px solid #404040;
-  margin-bottom: 20px;
 }
 
 .submit-btn {
