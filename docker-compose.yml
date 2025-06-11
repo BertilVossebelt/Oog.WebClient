@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   api:
-    image: bertilvossebelt/oog-api:latest
+    image: bertilvossebelt/oog.api:latest
     container_name: oog-api
     ports:
       - "5000:80"
