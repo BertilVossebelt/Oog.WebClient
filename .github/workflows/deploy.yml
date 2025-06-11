@@ -29,6 +29,6 @@ jobs:
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-            cd /home/${{ secrets.SERVER_USER }}/webclient
+            cd /home/${{ secrets.SERVER_USER }}/client
             docker-compose down
             docker-compose up --build -d
