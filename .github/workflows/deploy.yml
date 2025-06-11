@@ -1,0 +1,51 @@
+name: Deploy Web Client
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Cache Docker layers
+      uses: actions/cache@v3
+      with:
+        path: /tmp/.buildx-cache
+        key: ${{ runner.os }}-buildx-${{ github.sha }}
+        restore-keys: |
+          ${{ runner.os }}-buildx-
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+
+    - name: Login to Docker Hub
+      uses: docker/login-action@v3
+      with:
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_TOKEN }}
+
+    - name: Build and push Docker image
+      uses: docker/build-push-action@v5
+      with:
+        context: .
+        push: true
+        tags: |
+          bertilvossebelt/oog-webclient:latest
+          bertilvossebelt/oog-webclient:${{ github.sha }}
+
+    - name: Deploy to server
+      uses: appleboy/ssh-action@v1.0.3
+      with:
+        host: ${{ secrets.SERVER_HOST }}
+        username: ${{ secrets.SERVER_USERNAME }}
+        key: ${{ secrets.SERVER_SSH_KEY }}
+        script: |
+          # Redeploy using existing docker-compose
+          docker-compose pull
+          docker-compose up -d
