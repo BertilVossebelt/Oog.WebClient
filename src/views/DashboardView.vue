@@ -2,6 +2,7 @@
 import { onBeforeUnmount, onMounted, ref } from "vue";
 import { useEnvironmentStore } from "@/stores/environment";
 import { HubConnectionBuilder } from "@microsoft/signalr";
+const apiDomain = import.meta.env.VITE_API_DOMAIN;
 
 const environmentStore = useEnvironmentStore();
 
@@ -24,7 +25,7 @@ const setupSignalRConnection = async () => {
   try {
     // Create a connection to the SignalR hub
     connection = new HubConnectionBuilder()
-      .withUrl(`https://localhost:4040/rtes/v1/log?envId=${envId}`)
+      .withUrl(`${apiDomain}/rtes/v1/log?envId=${envId}`)
       .build();
 
     // Start the connection

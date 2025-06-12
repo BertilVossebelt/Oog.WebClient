@@ -1,24 +1,38 @@
 <script setup lang="ts">
 import { onMounted, ref } from "vue";
 import { useEnvironmentStore } from "@/stores/environment";
+const apiDomain = import.meta.env.VITE_API_DOMAIN;
 
 const environmentStore = useEnvironmentStore();
 
 interface Person {
+  id: number;
   username: string;
+  roles?: string[];
+}
+
+interface Role {
+  id: number;
+  envId: number;
+  name: string;
 }
 
 const people = ref<Person[]>([]);
+const roles = ref<Role[]>([]);
 
 const showInput = ref(false);
 const newAccount = ref("");
+
+const editingIndex = ref<number | null>(null);
+const selectedRoles = ref<string[]>([]);
+
 const toggleInput = () => {
   showInput.value = !showInput.value;
   newAccount.value = "";
 };
 
-const addPerson = () => {
-  fetch("https://localhost:4040/api/v1/environment/add/account", {
+const addPerson = async () => {
+  fetch(`${apiDomain}/api/v1/environment/add/account`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
@@ -31,7 +45,16 @@ const addPerson = () => {
       if (!response.ok) throw Error(response.statusText);
     })
     .then(async () => {
-      people.value.unshift({ username: newAccount.value });
+      const response = await fetch(`${apiDomain}/api/v1/environment/get/accounts`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          envId: environmentStore.currentEnvId,
+        }),
+        credentials: "include",
+      });
+      if (!response.ok) throw Error(response.statusText);
+      people.value = await response.json();
       toggleInput();
     })
     .catch((error) => {
@@ -39,8 +62,80 @@ const addPerson = () => {
     });
 };
 
+const edit = async (index: number, currentRoles?: string[]) => {
+  const person = people.value[index];
+
+  if (editingIndex.value === index) {
+    cancelEdit();
+    return;
+  }
+
+  editingIndex.value = index;
+
+  try {
+    const response = await fetch(`${apiDomain}/api/v1/account/get/roles`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+      body: JSON.stringify({
+        envId: environmentStore.currentEnvId,
+        accountId: person.id,
+      }),
+    });
+
+    if (!response.ok) throw new Error("Failed to fetch roles");
+
+    const roleData: { accountId: number; roleId: number }[] = await response.json();
+
+    selectedRoles.value = roleData
+      .map((roleEntry) => {
+        const matched = roles.value.find((r) => r.id === roleEntry.roleId);
+        return matched?.name;
+      })
+      .filter((name): name is string => !!name);
+  } catch (error) {
+    console.error("Failed to fetch person's roles:", error);
+    selectedRoles.value = currentRoles ? [...currentRoles] : [];
+  }
+};
+
+const cancelEdit = () => {
+  editingIndex.value = null;
+  selectedRoles.value = [];
+};
+
+const saveRoles = (person: Person) => {
+  fetch(`${apiDomain}/api/v1/account/add/role`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      envId: environmentStore.currentEnvId,
+      accountId: person.id,
+      roleIds: selectedRoles.value
+        .map((roleName) => {
+          const role = roles.value.find((r) => r.name === roleName);
+          return role?.id;
+        })
+        .filter((id): id is number => typeof id === "number"),
+    }),
+    credentials: "include",
+  })
+    .then((response) => {
+      if (!response.ok) throw Error("Failed to assign roles");
+      return response.json();
+    })
+    .then(() => {
+      person.roles = [...selectedRoles.value];
+      cancelEdit();
+    })
+    .catch((error) => {
+      console.error("Failed to assign roles:", error);
+    });
+};
+
 onMounted(() => {
-  fetch("https://localhost:4040/api/v1/environment/get/accounts", {
+  // Load accounts
+  fetch(`${apiDomain}/api/v1/environment/get/accounts`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
@@ -52,8 +147,25 @@ onMounted(() => {
       if (!response.ok) throw Error(response.statusText);
       return response.json();
     })
-    .then(async (data) => {
+    .then((data) => {
       people.value = data;
+    })
+    .catch((error) => {
+      console.error(error);
+    });
+
+  // Load roles
+  fetch(`${apiDomain}/api/v1/role/get/${environmentStore.currentEnvId}`, {
+    method: "GET",
+    headers: { "Content-Type": "application/json" },
+    credentials: "include",
+  })
+    .then((response) => {
+      if (!response.ok) throw Error(response.statusText);
+      return response.json();
+    })
+    .then((data) => {
+      roles.value = data;
     })
     .catch((error) => {
       console.error(error);
@@ -72,7 +184,7 @@ onMounted(() => {
       <table>
         <thead>
           <tr>
-            <th class="email-col">People management</th>
+            <th>People management</th>
             <th class="edit-btn-col plus-btn" @click="toggleInput" style="cursor: pointer">+</th>
           </tr>
         </thead>
@@ -91,10 +203,33 @@ onMounted(() => {
               <button @click="addPerson" class="add-btn">Add</button>
             </td>
           </tr>
-          <tr v-for="(person, index) in people" :key="index">
-            <td class="email-col">{{ person.username }}</td>
-            <td class="edit-btn-col"></td>
-          </tr>
+
+          <template v-for="(person, index) in people" :key="index">
+            <tr>
+              <td class="email-col">{{ person.username }}</td>
+              <td class="edit-btn-col">
+                <span @click="edit(index, person.roles)" style="cursor: pointer">✎</span>
+              </td>
+            </tr>
+            <tr v-if="editingIndex === index">
+              <td colspan="2" style="background: var(--color-background-soft); padding: 10px">
+                <div>
+                  <label class="role-select-label">Assign Roles:</label>
+                  <select v-model="selectedRoles" multiple class="role-select">
+                    <option v-for="role in roles" :key="role.name" :value="role.name">
+                      {{ role.name }}
+                    </option>
+                  </select>
+                </div>
+                <div class="action-btn-row">
+                  <button @click="cancelEdit" class="cancel-btn" style="margin-left: 10px">
+                    Cancel
+                  </button>
+                  <button @click="() => saveRoles(person)" class="save-btn">Save</button>
+                </div>
+              </td>
+            </tr>
+          </template>
         </tbody>
       </table>
     </div>
@@ -203,6 +338,22 @@ tr:last-child td {
   user-select: none;
 }
 
+.role-select {
+  width: 15%;
+  padding: 10px;
+  font-size: 16px;
+  background: var(--color-background);
+  color: var(--vt-c-white);
+  border: 1px solid var(--color-border);
+  border-radius: 5px;
+  margin-top: 5px;
+}
+
+.role-select-label {
+  width: 100%;
+  display: block;
+}
+
 .pagination {
   margin-top: 10px;
   text-align: center;
@@ -230,5 +381,27 @@ tr:last-child td {
 
 .back:hover {
   text-decoration: underline;
+}
+
+.action-btn-row {
+  float: right;
+}
+
+.save-btn {
+  border: none;
+  background-color: var(--color-background-soft);
+  color: #fff;
+  font-size: 18px;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.cancel-btn {
+  border: none;
+  background-color: var(--color-background-soft);
+  color: var(--color-text);
+  font-size: 18px;
+  text-decoration: underline;
+  cursor: pointer;
 }
 </style>

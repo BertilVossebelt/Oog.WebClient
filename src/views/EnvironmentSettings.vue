@@ -9,8 +9,9 @@
     </div>
 
     <h1>Environment settings</h1>
-    <router-link to="/people-management" class="link">People management</router-link>
     <router-link to="/application-management" class="link">Application management</router-link>
+    <router-link to="/people-management" class="link">People management</router-link>
+    <router-link to="/role-management" class="link">Role management</router-link>
   </div>
 </template>
 

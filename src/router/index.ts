@@ -7,6 +7,7 @@ import DashboardView from "@/views/DashboardView.vue";
 import PeopleManagementView from "@/views/PeopleManagementView.vue";
 import EnvironmentSettings from "@/views/EnvironmentSettings.vue";
 import ApplicationManagementView from "@/views/ApplicationManagementView.vue";
+import RoleManagementView from "@/views/RoleManagementView.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -50,6 +51,11 @@ const router = createRouter({
       path: '/people-management',
       name: 'people-management',
       component: PeopleManagementView,
+    },
+    {
+      path: '/role-management',
+      name: 'role-management',
+      component: RoleManagementView,
     },
   ],
 })
