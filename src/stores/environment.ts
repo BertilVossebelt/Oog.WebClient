@@ -2,10 +2,10 @@ import { defineStore } from "pinia";
 
 export const useEnvironmentStore = defineStore("environment", {
   state: () => ({
-    currentEnvId: null as bigint | null,
+    currentEnvId: null as number | null,
   }),
   actions: {
-    setEnvId(envId: bigint) {
+    setEnvId(envId: number) {
       this.currentEnvId = envId;
     },
   },
