@@ -24,7 +24,7 @@ const addRole = () => {
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
       envId: environmentStore.currentEnvId,
-      role: newRole.value,
+      name: newRole.value,
     }),
     credentials: "include",
   })
