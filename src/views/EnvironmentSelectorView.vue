@@ -45,7 +45,7 @@ interface EnvResponseData {
   name: string;
 }
 
-const newEnv: Env = reactive({ id: 0n, name: "" });
+const newEnv: Env = reactive({ id: 0, name: "" });
 const createNewEnv = async () => {
   fetch(`${apiDomain}/api/v1/environment/create`, {
     method: "POST",
