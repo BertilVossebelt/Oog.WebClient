@@ -7,7 +7,7 @@ const apiDomain = import.meta.env.VITE_API_DOMAIN;
 const environmentStore = useEnvironmentStore();
 
 interface Env {
-  id: bigint;
+  id: number;
   name: string;
 }
 
@@ -16,7 +16,7 @@ const envs = ref<Env[]>([]);
 /*
 * OnClick method for env boxes.
 */
-const goToDashboard = (envId: bigint): void => {
+const goToDashboard = (envId: number): void => {
   environmentStore.setEnvId(envId);
   router.push("/dashboard");
 };
@@ -41,11 +41,11 @@ const toggleNewEnvInput = (): void => {
 * Create a new env and add it to the env picker.
 */
 interface EnvResponseData {
-  id: bigint;
+  id: number;
   name: string;
 }
 
-const newEnv: Env = reactive({ id: 0n, name: "" });
+const newEnv: Env = reactive({ id: 0, name: "" });
 const createNewEnv = async () => {
   fetch(`${apiDomain}/api/v1/environment/create`, {
     method: "POST",
@@ -59,7 +59,7 @@ const createNewEnv = async () => {
       })
       .then((data: EnvResponseData) => {
         const createdEnv: Env = {
-          id: BigInt(data.id),
+          id: data.id,
           name: data.name,
         }
 

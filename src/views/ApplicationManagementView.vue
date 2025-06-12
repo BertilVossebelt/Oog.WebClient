@@ -6,7 +6,7 @@ const apiDomain = import.meta.env.VITE_API_DOMAIN;
 const environmentStore = useEnvironmentStore();
 
 interface App {
-  envId: bigint | null;
+  envId: number | null;
   name: string;
   passkey: string;
 }
