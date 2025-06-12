@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { onMounted, ref } from "vue";
 import { useEnvironmentStore } from "@/stores/environment";
+const apiDomain = import.meta.env.VITE_API_DOMAIN;
 
 const environmentStore = useEnvironmentStore();
 
@@ -31,7 +32,7 @@ const toggleInput = () => {
 };
 
 const addPerson = async () => {
-  fetch("https://localhost:4040/api/v1/environment/add/account", {
+  fetch(`${apiDomain}/api/v1/environment/add/account`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
@@ -44,7 +45,7 @@ const addPerson = async () => {
       if (!response.ok) throw Error(response.statusText);
     })
     .then(async () => {
-      const response = await fetch("https://localhost:4040/api/v1/environment/get/accounts", {
+      const response = await fetch(`${apiDomain}/api/v1/environment/get/accounts`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -72,7 +73,7 @@ const edit = async (index: number, currentRoles?: string[]) => {
   editingIndex.value = index;
 
   try {
-    const response = await fetch("https://localhost:4040/api/v1/account/get/roles", {
+    const response = await fetch(`${apiDomain}/api/v1/account/get/roles`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       credentials: "include",
@@ -104,7 +105,7 @@ const cancelEdit = () => {
 };
 
 const saveRoles = (person: Person) => {
-  fetch("https://localhost:4040/api/v1/account/add/role", {
+  fetch(`${apiDomain}/api/v1/account/add/role`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
@@ -134,7 +135,7 @@ const saveRoles = (person: Person) => {
 
 onMounted(() => {
   // Load accounts
-  fetch("https://localhost:4040/api/v1/environment/get/accounts", {
+  fetch(`${apiDomain}/api/v1/environment/get/accounts`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
@@ -154,7 +155,7 @@ onMounted(() => {
     });
 
   // Load roles
-  fetch(`https://localhost:4040/api/v1/role/get/${environmentStore.currentEnvId}`, {
+  fetch(`${apiDomain}/api/v1/role/get/${environmentStore.currentEnvId}`, {
     method: "GET",
     headers: { "Content-Type": "application/json" },
     credentials: "include",

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { onMounted, ref } from "vue";
 import { useEnvironmentStore } from "@/stores/environment";
+const apiDomain = import.meta.env.VITE_API_DOMAIN;
 
 const environmentStore = useEnvironmentStore();
 
@@ -18,7 +19,7 @@ const toggleInput = () => {
 };
 
 const addRole = () => {
-  fetch("https://localhost:4040/api/v1/role/create", {
+  fetch(`${apiDomain}/api/v1/role/create`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
@@ -40,7 +41,7 @@ const addRole = () => {
 };
 
 onMounted(() => {
-  fetch(`https://localhost:4040/api/v1/role/get/${environmentStore.currentEnvId}`, {
+  fetch(`${apiDomain}/api/v1/role/get/${environmentStore.currentEnvId}`, {
     method: "GET",
     headers: { "Content-Type": "application/json" },
     credentials: "include",

@@ -2,6 +2,7 @@
 import { nextTick, onMounted, reactive, ref } from "vue";
 import { useEnvironmentStore } from '@/stores/environment';
 import router from "@/router";
+const apiDomain = import.meta.env.VITE_API_DOMAIN;
 
 const environmentStore = useEnvironmentStore();
 
@@ -46,7 +47,7 @@ interface EnvResponseData {
 
 const newEnv: Env = reactive({ id: 0n, name: "" });
 const createNewEnv = async () => {
-  fetch("https://localhost:4040/api/v1/environment/create", {
+  fetch(`${apiDomain}/api/v1/environment/create`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(newEnv),
@@ -76,7 +77,7 @@ const createNewEnv = async () => {
 // Request all environments of the current user on page load.
 */
 onMounted(() => {
-  fetch("https://localhost:4040/api/v1/environment/read", {
+  fetch(`${apiDomain}/api/v1/environment/read`, {
     method: "GET",
     headers: { "Content-Type": "application/json" },
     credentials: "include",

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { reactive } from "vue";
 import { useEnvironmentStore } from "@/stores/environment";
+const apiDomain = import.meta.env.VITE_API_DOMAIN;
 
 const environmentStore = useEnvironmentStore();
 
@@ -22,7 +23,7 @@ interface AppResponseData {
 }
 
 const createApp = () => {
-  fetch("https://localhost:4040/api/v1/application/create", {
+  fetch(`${apiDomain}/api/v1/application/create`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(app),

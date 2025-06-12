@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { reactive } from "vue";
 import { useRouter } from "vue-router";
+const apiDomain = import.meta.env.VITE_API_DOMAIN;
 
 const router = useRouter();
 
@@ -15,7 +16,7 @@ const credentials: Credentials = reactive({
 })
 
 const login = async () => {
-  fetch("https://localhost:4040/api/v1/account/authenticate", {
+  fetch(`${apiDomain}/api/v1/account/authenticate`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(credentials),

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { reactive } from "vue";
 import router from "@/router";
+const apiDomain = import.meta.env.VITE_API_DOMAIN;
 
 interface Credentials {
   username: string,
@@ -15,7 +16,7 @@ const credentials: Credentials = reactive({
 })
 
 const register = async (): Promise<void> => {
-  fetch("https://localhost:4040/api/v1/account/create", {
+  fetch(`${apiDomain}/api/v1/account/create`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(credentials),
@@ -31,7 +32,7 @@ const register = async (): Promise<void> => {
 }
 
 const login = async () => {
-  fetch("https://localhost:4040/api/v1/account/authenticate", {
+  fetch(`${apiDomain}/api/v1/account/authenticate`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(credentials),
